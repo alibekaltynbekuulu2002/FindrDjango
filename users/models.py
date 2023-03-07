@@ -1,73 +1,62 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin,BaseUserManager
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, email, password=None, **extra_fields):
+    def create_user(self,phone_number,email,first_name,last_name,password,**extra_fields):
         if not phone_number:
-            raise ValueError("The phone number must be set")
-        user = self.model(phone_number=phone_number,
-                          email=email, **extra_fields)
+            raise ValueError(_('The phone number field must be set'))
+        if not email:
+            raise ValueError(_('The email field must be set'))
+        if not first_name:
+            raise ValueError(_('The first name field must be set'))
+        if not last_name:
+            raise ValueError(_('The last name field must be set'))
+        
+        email = self.normalize_email(email)
+        user = self.model(
+            phone_number=phone_number,email=email,
+            first_name=first_name,last_name=last_name,
+            **extra_fields)
+            
         user.set_password(password)
         user.save()
         return user
+        
 
-    def create_superuser(self, phone_number, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError("The Email field must be set")
-
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+    def create_superuser(self,phone_number,email,first_name,last_name,password,**extra_fields):
+        extra_fields.setdefault('is_staff',True)
+        extra_fields.setdefault('is_superuser',True)
+        extra_fields.setdefault('is_active',True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True')
+            raise ValueError(_('The superuser must be assigned to is_staff = True.'))
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True')
+            raise ValueError(_('The superuser must be assigned to is_superuser = True.'))
 
-        return self.create_user(phone_number, email, password, **extra_fields)
+        return self.create_user(phone_number,email,first_name,last_name,password,**extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.CharField(max_length=13, unique=True)
-    email = models.EmailField(unique=True, null=True, blank=True)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
 
-    class Gender(models.TextChoices):
-        MALE = 'M'
-        FEMALE = 'F'
-
-    gender = models.CharField(Gender.choices, default=None, max_length=6)
-    is_active = models.BooleanField(default=True)
+# Create your models here.
+class User(AbstractBaseUser,PermissionsMixin):
+    phone_number = models.CharField(_('phone number'),unique=True,max_length=30)
+    email = models.EmailField(_('email address'),unique=True,max_length=255,null=True,blank=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email','first_name','last_name']
 
-    def __str__(self):
-        return self.email
+    def __str__(self) -> str:
+        return f'{self.phone_number} : {self.first_name} {self.last_name}'
 
-
-class UserAddress(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    street = models.CharField(max_length=100)
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-    zip_code = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.street
-
-
-class UserPayment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    card_number = models.CharField(max_length=16)
-    exp_month = models.IntegerField()
-    exp_year = models.IntegerField()
-
-    def __str__(self):
-        return self.card_number
+    class Meta:
+        db_table = 'users'
