@@ -2,28 +2,20 @@ from django.contrib import admin
 from .models import User,UserAddress,UserPayment
 from django.contrib.auth.admin import UserAdmin
 
-# USER 
+"""
+USER
+"""
 class UserAdminConfig(UserAdmin):
-    search_fields = ('email','phone_number','first_name','last_name',) # search options
-    ordering = ('-created_at',) # ordering options -> shows looking by given param.
-
-    # this is for displaying list of users by showing their fields
+    search_fields = ('email','phone_number','first_name','last_name',)
+    ordering = ('-created_at',)
     list_display = ('email','phone_number','first_name','last_name','is_active','is_staff','created_at',)
-
-    # filtering options for users
     list_filter = ('email','first_name','last_name','is_active','is_staff',)
-
-    # this are readonly fields these fields are non changible 
     readonly_fields = ('created_at','modified_at')
-
-    # this fieldsets for user model
     fieldsets = ( 
         (None,{'fields':('email','phone_number','first_name','last_name','password')}),
         ('Permissions',{'fields':('is_staff','is_active',)}),
         ('Actions',{'fields':('created_at','modified_at',)}),
     )
-
-    # this fieldsets for adding a new user address
     add_fieldsets = (
         (None,{
             'classes':('wide',),
@@ -34,7 +26,9 @@ class UserAdminConfig(UserAdmin):
 admin.site.register(User,UserAdminConfig)
 
 
-# USER ADDRESS
+"""
+USER ADDRESS
+"""
 class UserAddressAdminConfig(admin.ModelAdmin):
     search_fields = ('country','city','address_line1','address_line2','postal_code',)
     ordering = ('-country',)
@@ -54,8 +48,9 @@ admin.site.register(UserAddress,UserAddressAdminConfig)
 
 
 
-
-# USER PAYMENTS
+"""
+USER PAYMENT
+"""
 class UserPaymentAdminConfig(admin.ModelAdmin):
     search_fields = ('user','payment_type','provider','account_no','expiry',)
     ordering = ('-user',)

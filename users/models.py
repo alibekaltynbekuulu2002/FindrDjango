@@ -37,8 +37,6 @@ class UserManager(BaseUserManager):
         return self.create_user(phone_number,email,first_name,last_name,password,**extra_fields)
 
 
-
-# Create your models here.
 class User(AbstractBaseUser,PermissionsMixin):
     MALE = 'MALE'
     FEMALE = 'FEMALE'
