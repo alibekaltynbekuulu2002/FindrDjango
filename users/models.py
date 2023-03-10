@@ -108,3 +108,7 @@ class UserPayment(models.Model):
     class Meta:
         db_table = 'user_payments'
 
+
+
+
+
