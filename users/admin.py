@@ -7,14 +7,15 @@ USER
 """
 class UserAdminConfig(UserAdmin):
     search_fields = ('email','phone_number','first_name','last_name',)
-    ordering = ('-created_at',)
+    ordering = ('created_at',)
     list_display = ('email','phone_number','first_name','last_name','is_active','is_staff','created_at',)
     list_filter = ('email','first_name','last_name','is_active','is_staff',)
-    readonly_fields = ('created_at','modified_at')
+    readonly_fields = ('created_at','modified_at','is_superuser')
     fieldsets = ( 
         (None,{'fields':('email','phone_number','first_name','last_name','password')}),
-        ('Permissions',{'fields':('is_staff','is_active',)}),
+        ('Permissions',{'fields':('is_staff','is_active','is_superuser')}),
         ('Actions',{'fields':('created_at','modified_at',)}),
+        ('Groups',{'fields':('groups',)})
     )
     add_fieldsets = (
         (None,{
@@ -65,6 +66,6 @@ class UserPaymentAdminConfig(admin.ModelAdmin):
             'fields':('user','payment_type','provider','account_no','expiry',)
         }),
     )
-
-
+    
 admin.site.register(UserPayment,UserPaymentAdminConfig)
+
