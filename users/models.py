@@ -67,11 +67,9 @@ class User(AbstractBaseUser,PermissionsMixin):
     class Meta:
         db_table = 'users'
 
-
-
-
+    
 class UserAddress(models.Model):
-    user = models.ForeignKey(User,related_name='address',on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True,related_name='address')
     address_line1 = models.CharField(_('Address Line 1'),max_length=100)
     address_line2 = models.CharField(_('Address Line 2'),max_length=100,null=True,blank=True)
     city = models.CharField(_('City'),max_length=50,default='Bishkek')
@@ -94,7 +92,7 @@ class UserPayment(models.Model):
         (CASH,'Cash')
     ]
 
-    user = models.ForeignKey(User,related_name='payment',on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True,related_name='payment')
     payment_type = models.CharField(max_length=20,choices=PAYMENT_TYPE_CHOICES,default=CASH)
     provider = models.CharField(max_length=50,null=True,blank=True)
     account_no = models.CharField(max_length=50,null=True,blank=True)

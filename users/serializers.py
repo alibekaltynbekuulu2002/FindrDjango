@@ -14,11 +14,15 @@ class UserPaymentSerializer(serializers.ModelSerializer):
         model = UserPayment
         fields = '__all__'
 
+
 class UserSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField(read_only=True)
+    address = UserAddressSerializer()
+    payment = UserPaymentSerializer()
+    
     class Meta:
         model = User
-        fields = '__all__'
+        exclude = ['password']
 
     def get_url(self,obj):
         request = self.context.get('request')
@@ -37,5 +41,4 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
-    
     

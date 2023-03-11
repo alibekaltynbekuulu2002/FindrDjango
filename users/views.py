@@ -26,7 +26,7 @@ def get_user(request,id):
     RETURNS USER BY LOOKING UP IT'S ID
     """
     try:
-        user = User.objects.prefetch_related('address').get(id=id)
+        user = User.objects.get(id=id)
     except User.DoesNotExist:
         return Response({'message':'User was not found.'},status=status.HTTP_404_NOT_FOUND)
     serializer = UserSerializer(user,many=False,context={'request':request})
